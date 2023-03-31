@@ -20,13 +20,18 @@ check_url() {
   local response_body
   response_body=$(curl -s -L "$url")
 
-  if [[ "$response_body" == *"Page Not Found"* ]]; then
-    echo "Error: 'Page Not Found' found in URL - $url"
+  if [[ "$response_body" == *"Page not found"* ]]; then
+    echo "Error: 'Page not found' found in URL - $url"
     return 1
   else
     echo "URL is valid"
     return 0
   fi
+}
+
+is_image_url() {
+  local url=$1
+  [[ $url =~ \.(jpg|jpeg|png|gif|bmp|svg|webp)$ ]]
 }
 
 # Main script
@@ -38,7 +43,7 @@ invalid_urls=0
 for md_file in $(find_md_files); do
   echo "Checking URLs in file: $md_file"
   for url in $(extract_urls "$md_file"); do
-    if [[ $url == *"truecharts.org"* ]]; then
+    if [[ $url == *"truecharts.org"* ]] && ! is_image_url "$url"; then
       echo "Checking URL: $url"
       total_urls=$((total_urls+1))
       if check_url "$url"; then
