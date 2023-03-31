@@ -2,6 +2,9 @@
 
 set -e
 
+# Enable case-insensitive pattern matching
+shopt -s nocasematch
+
 # Utility functions
 find_md_files() {
   find . -name "*.md"
@@ -17,8 +20,8 @@ check_url() {
   local response_body
   response_body=$(curl -s -L "$url")
 
-  if [[ "$response_body" == *"Page not found"* ]]; then
-    echo "Error: 'Page not found' found in URL - $url"
+  if [[ "$response_body" == *"Page Not Found"* ]]; then
+    echo "Error: 'Page Not Found' found in URL - $url"
     return 1
   else
     echo "URL is valid"
@@ -28,17 +31,33 @@ check_url() {
 
 # Main script
 failed=0
+total_urls=0
+valid_urls=0
+invalid_urls=0
+
 for md_file in $(find_md_files); do
   echo "Checking URLs in file: $md_file"
   for url in $(extract_urls "$md_file"); do
     if [[ $url == *"truecharts.org"* ]]; then
       echo "Checking URL: $url"
-      if ! check_url "$url"; then
+      total_urls=$((total_urls+1))
+      if check_url "$url"; then
+        valid_urls=$((valid_urls+1))
+      else
+        invalid_urls=$((invalid_urls+1))
         failed=1
       fi
     fi
   done
 done
+
+# Display results
+echo "---------------------------------------"
+echo "Results:"
+echo "Total URLs checked: $total_urls"
+echo "Valid URLs: $valid_urls"
+echo "Invalid URLs: $invalid_urls"
+echo "---------------------------------------"
 
 if [[ $failed -eq 1 ]]; then
   exit 1
