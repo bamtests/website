@@ -2,9 +2,6 @@
 
 set -e
 
-# Enable case-insensitive pattern matching
-shopt -s nocasematch
-
 # Utility functions
 find_md_files() {
   find . -name "*.md"
@@ -12,7 +9,7 @@ find_md_files() {
 
 extract_urls() {
   local file=$1
-  grep -Eo 'http[s]?://[^ ]+' "$file"
+  grep -Eo 'http[s]?://[^ )]+' "$file"
 }
 
 check_url() {
@@ -20,8 +17,8 @@ check_url() {
   local response_body
   response_body=$(curl -s -L "$url")
 
-  if [[ "$response_body" == *"Page not found"* ]]; then
-    echo "Error: 'Page not found' found in URL - $url"
+  if [[ "$response_body" == *"Page Not Found"* ]]; then
+    echo "Error: 'Page Not Found' found in URL - $url"
     return 1
   else
     echo "URL is valid"
