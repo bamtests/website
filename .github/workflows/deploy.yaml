@@ -1,72 +1,72 @@
-name: Build and Deploy
+# name: Build and Deploy
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+#   workflow_dispatch:
 
-jobs:
-  deploy:
-    name: Build & Deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 10
+# jobs:
+#   deploy:
+#     name: Build & Deploy
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Set Swap Space
+#         uses: pierotofy/set-swap-space@master
+#         with:
+#           swap-size-gb: 10
           
-      - uses: actions/checkout@v3
+#       - uses: actions/checkout@v3
       
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: yarn
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: 18
+#           cache: yarn
           
-      - name: Cache node modules
-        id: cache-npm
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: node_modules/.cache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+#       - name: Cache node modules
+#         id: cache-npm
+#         uses: actions/cache@v3
+#         env:
+#           cache-name: cache-node-modules
+#         with:
+#           # npm cache files are stored in `~/.npm` on Linux/macOS
+#           path: node_modules/.cache
+#           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-build-${{ env.cache-name }}-
+#             ${{ runner.os }}-build-
+#             ${{ runner.os }}-
 
-      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-        name: List the state of node modules
-        continue-on-error: true
-        run: npm list
+#       - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+#         name: List the state of node modules
+#         continue-on-error: true
+#         run: npm list
           
-      - uses: borales/actions-yarn@v4.2.0
-        with:
-          cmd: install --frozen-lockfile
-        env:
-          NODE_OPTIONS: "--max-old-space-size=15000"
-          DOCUSAURUS_SSR_CONCURRENCY: 3
-          SKIP_HTML_MINIFICATION: false
+#       - uses: borales/actions-yarn@v4.2.0
+#         with:
+#           cmd: install --frozen-lockfile
+#         env:
+#           NODE_OPTIONS: "--max-old-space-size=15000"
+#           DOCUSAURUS_SSR_CONCURRENCY: 3
+#           SKIP_HTML_MINIFICATION: false
         
-      - uses: borales/actions-yarn@v4.2.0
-        with:
-          cmd: build
-        env: 
-          NODE_OPTIONS: "--max-old-space-size=15000"
-          DOCUSAURUS_SSR_CONCURRENCY: 3
-          SKIP_HTML_MINIFICATION: false
+#       - uses: borales/actions-yarn@v4.2.0
+#         with:
+#           cmd: build
+#         env: 
+#           NODE_OPTIONS: "--max-old-space-size=15000"
+#           DOCUSAURUS_SSR_CONCURRENCY: 3
+#           SKIP_HTML_MINIFICATION: false
 
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: website
-          directory: ./build
+#       - name: Publish to Cloudflare Pages
+#         uses: cloudflare/pages-action@v1
+#         with:
+#           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+#           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+#           projectName: website
+#           directory: ./build
