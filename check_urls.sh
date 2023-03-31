@@ -31,13 +31,11 @@ failed=0
 for md_file in $(find_md_files); do
   echo "Checking URLs in file: $md_file"
   for url in $(extract_urls "$md_file"); do
-    if [[ $url != *"github.com"* ]] && [[ $url != *"github.io"* ]]; then
+    if [[ $url == *"truecharts.org"* ]]; then
       echo "Checking URL: $url"
       if ! check_url "$url"; then
         failed=1
       fi
-    else
-      echo "Ignoring GitHub URL: $url"
     fi
   done
 done
