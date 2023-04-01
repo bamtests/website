@@ -26,10 +26,10 @@ check_url() {
   fi
 }
 
-is_image_url() {
-  local url=$1
-  [[ $url =~ \.(jpg|jpeg|png|gif|bmp|svg|webp)$ ]]
-}
+# is_image_url() {
+#   local url=$1
+#   [[ $url =~ \.(jpg|jpeg|png|gif|bmp|svg|webp)$ ]]
+# }
 
 # Main script
 failed=0
@@ -40,7 +40,7 @@ invalid_urls=0
 for md_file in $(find_md_files); do
   echo "Checking URLs in file: $md_file"
   for url in $(extract_urls "$md_file"); do
-    if [[ $url == *"truecharts.org"* ]] && ! is_image_url "$url"; then
+    if [[ $url == *"truecharts.org"* ]] &&  $url != *"truecharts.org/img"*; then
       echo "Checking URL: $url"
       total_urls=$((total_urls+1))
       if check_url "$url"; then
