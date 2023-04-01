@@ -9,7 +9,7 @@ find_md_files() {
 
 extract_urls() {
   local file=$1
-  grep -Eo 'http[s]?://[^ ]+' "$file"
+  grep -Eo 'http[s]?://[^ )]+' "$file"
 
 }
 
